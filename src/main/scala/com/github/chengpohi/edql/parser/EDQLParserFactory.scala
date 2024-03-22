@@ -19,7 +19,7 @@ class EDQLParserFactory(val myFileExt: String,
   }
 
   def createFile(virtualFile: LightVirtualFile): PsiFile = {
-    psiFileFactory.trySetupPsiForFile(virtualFile, EDQLLanguage.INSTANCE, true, false)
+    psiFileFactory.trySetupPsiForFile(virtualFile, EDQLLanguage.INSTANCE, false, false)
   }
 }
 

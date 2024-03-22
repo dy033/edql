@@ -4,7 +4,6 @@ import com.github.chengpohi.edql.parser.json.{JsonCollection, JsonValParser}
 import com.github.chengpohi.edql.parser.psi._
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.util.Computable
-import com.intellij.openapi.vfs.{LocalFileSystem, VfsUtil}
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiComment, PsiErrorElement, PsiFile, PsiWhiteSpace}
 import org.apache.commons.collections.CollectionUtils
@@ -33,8 +32,6 @@ class EDQLPsiInterceptor(val parserFactory: EDQLParserFactory) extends Intercept
           if (!expr.textMatches(text)) {
             throw new RuntimeException("parse failed: " + text)
           }
-          psiFile.getVirtualFile.delete(null)
-          psiFile.delete();
           scala.util.Success(toJsonVal(expr))
         } catch {
           case ex: Throwable => {
