@@ -622,16 +622,17 @@ trait InstructionInvoker {
 
   private def dropOnePath(context: ScriptContext): Unit = {
     val strs = context.variables.getOrElse("INVOKE_PATH", "").asInstanceOf[JsonCollection.Str].value.split("\\$")
-    context.variables.put("INVOKE_PATH", JsonCollection.Str(strs.dropRight(1).mkString("$")))
+    val invokePath = strs.dropRight(1).mkString("$")
+    context.variables.put("INVOKE_PATH", JsonCollection.Str(invokePath))
+
+    context.variables.keys.filter(i => i.startsWith(strs.mkString("$"))).foreach(i => {
+      context.variables.remove(i)
+    })
   }
 
   private def setInvokePath(context: ScriptContext, funName: Option[String]) = {
     val invokePath = getInvokePath(context.variables)
     val path = List(invokePath, funName).filter(_.isDefined).map(_.get).filter(!_.isBlank).mkString("$")
-    putInvokePath(context, path)
-  }
-
-  private def putInvokePath(context: ScriptContext, path: String) = {
     context.variables.put("INVOKE_PATH", JsonCollection.Str(path.split("\\$").mkString("$")))
   }
 
