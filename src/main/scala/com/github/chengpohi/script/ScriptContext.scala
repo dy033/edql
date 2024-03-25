@@ -12,6 +12,8 @@ sealed case class ScriptContext(hostInfo: HostInfo) extends EDQLConfig with Cont
   override implicit val resultTimeout: Duration = Duration.apply(hostInfo.timeout, duration.MILLISECONDS)
   override implicit val kibanaProxy: Boolean = hostInfo.kibanaProxy
   override implicit lazy val eqlClient: EDQLClient = buildRestClient(hostInfo)
+
+  def clear(): Unit = variables.clear()
 }
 
 object ScriptContext {

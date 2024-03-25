@@ -35,6 +35,8 @@ trait InstructionInvoker {
     val (functions, context) = this.buildContext(scriptContextIns, endpointBind, runContext)
 
     val invokeResult = runInstructions(functions, context, invokeIns)
+    context.clear()
+
     EDQLRunResult(invokeResult.map {
       case j: JsonCollection.Str => j.raw
       case j: JsonCollection.Var => j.realValue map {
@@ -43,6 +45,7 @@ trait InstructionInvoker {
       } getOrElse ""
       case a => a.toJson
     }.filter(_.nonEmpty), runContext)
+
   }
 
   private def buildContext(cIns: Seq[Instruction2],
