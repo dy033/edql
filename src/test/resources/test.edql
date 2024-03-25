@@ -136,3 +136,5 @@ POST fff@fff/_search
     }
   }
 }
+
+var ap = {"c": 2} + {"d": 3} + {"j": {"ccc": "22", "d": 7}, "c": 3}

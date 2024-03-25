@@ -1,7 +1,6 @@
 package com.github.chengpohi.edql.parser.json
 
 import com.fasterxml.jackson.core.io.JsonStringEncoder
-import com.google.gson.JsonPrimitive
 import org.apache.commons.lang3.StringUtils
 
 import scala.reflect.runtime.universe._
@@ -125,7 +124,7 @@ object JsonCollection {
     }
   }
 
-  case class Obj(value: (Val, Val)*) extends AnyVal with Val {
+  case class Obj(value: (Val, Val)*) extends AnyVal with Arith {
     override def toJson: String = {
       val valueJson = value.map {
         case (n, v) => {
@@ -154,6 +153,19 @@ object JsonCollection {
     }
 
     override def copy: Val = Obj(value.map(i => (i._1.copy, i._2.copy)): _*)
+
+    override def plus(i: Arith): Arith = i match {
+      case n: JsonCollection.Obj => {
+        JsonCollection.Obj((value ++ n.value): _*)
+      }
+      case _ => throw new RuntimeException("not support + type: " + i)
+    }
+
+    override def minus(i: Arith): Arith = throw new RuntimeException("not support + type: " + i)
+
+    override def multiply(i: Arith): Arith = throw new RuntimeException("not support + type: " + i)
+
+    override def div(i: Arith): Arith = throw new RuntimeException("not support + type: " + i)
   }
 
   case class Arr(value: Val*) extends AnyVal with Val {

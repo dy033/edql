@@ -512,6 +512,7 @@ trait InstructionInvoker {
       }
       case i: JsonCollection.Num => i
       case i: JsonCollection.Str => i
+      case i: JsonCollection.Obj => i
       case i: JsonCollection.Var => {
         mapRealValue(functions, context, i, funName)
         evalBasicValue(functions, context, i.realValue.get, funName)
