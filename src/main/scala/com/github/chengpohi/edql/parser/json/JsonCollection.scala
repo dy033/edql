@@ -53,7 +53,7 @@ object JsonCollection {
 
     override def div(i: Arith): Arith = throw new RuntimeException("not support + type: " + i)
 
-    override def copy: Val = Str(value)
+    override def copy: Val = this
   }
 
   abstract class Dynamic extends Val {
@@ -73,7 +73,7 @@ object JsonCollection {
     override def copy: Val = {
       val va = Var(value)
       va.realValue = realValue.map(_.copy)
-      va
+      va.realValue.getOrElse(this)
     }
 
     override def clean(): Unit = realValue = None
@@ -88,8 +88,7 @@ object JsonCollection {
 
     override def copy: Val = {
       val f = Fun((value._1, value._2.map(i => i.copy)))
-      f.realValue = realValue.map(_.copy)
-      f
+      realValue.map(_.copy).getOrElse(this)
     }
 
     override def clean(): Unit = {
@@ -105,8 +104,7 @@ object JsonCollection {
 
     override def copy: Val = {
       val tree = ArithTree(a.copy, op, b.map(_.copy))
-      tree.realValue = realValue.map(_.copy.asInstanceOf[Arith])
-      tree
+      realValue.map(_.copy.asInstanceOf[Arith]).getOrElse(tree)
     }
 
     override def value: (JsonCollection.Val, Option[String], Option[JsonCollection.Val]) = (a, op, b)
@@ -116,8 +114,14 @@ object JsonCollection {
         case d: Dynamic => d.clean()
         case _ =>
       }
+      a.vars.foreach(_.clean())
       b match {
-        case Some(o) => if (o.isInstanceOf[Dynamic]) o.asInstanceOf[Dynamic].clean()
+        case Some(o) => {
+          if (o.isInstanceOf[Dynamic]) {
+            o.asInstanceOf[Dynamic].clean()
+          }
+          o.vars.foreach(_.clean())
+        }
         case _ =>
       }
       realValue = None
@@ -239,7 +243,7 @@ object JsonCollection {
       }
     }
 
-    override def copy: Val = Num(value)
+    override def copy: Val = this
   }
 
   def addNumbers(a: Number, b: Number): Number = {
@@ -263,7 +267,7 @@ object JsonCollection {
 
     override def get(path: String): Option[Val] = None
 
-    override def copy: Val = False
+    override def copy: Val = this
   }
 
   case object True extends Val {
@@ -273,7 +277,7 @@ object JsonCollection {
 
     override def get(path: String): Option[Val] = None
 
-    override def copy: Val = True
+    override def copy: Val = this
   }
 
   case object Null extends Val {
@@ -283,7 +287,7 @@ object JsonCollection {
 
     override def get(path: String): Option[Val] = None
 
-    override def copy: Val = Null
+    override def copy: Val = this
   }
 
 
@@ -308,7 +312,7 @@ object JsonCollection {
 
     override def get(path: String): Option[Val] = None
 
-    override def copy: Val = Comment
+    override def copy: Val = this
   }
 
   implicit class JsonConverter(value: Val) {

@@ -401,6 +401,7 @@ trait InstructionInvoker {
     setInvokePath(context, funName)
     try {
       instructions.foreach(po => {
+        po.ds.foreach(_.vars.foreach(j => j.realValue = None))
         evalDs(functions, context, po.ds, funName)
       })
 
@@ -515,7 +516,10 @@ trait InstructionInvoker {
       }
       case i: JsonCollection.Num => i
       case i: JsonCollection.Str => i
-      case i: JsonCollection.Obj => i
+      case i: JsonCollection.Obj => {
+        mapRealValue(functions, context, i, funName)
+        i
+      }
       case i: JsonCollection.Var => {
         mapRealValue(functions, context, i, funName)
         evalBasicValue(functions, context, i.realValue.get, funName)
@@ -544,29 +548,6 @@ trait InstructionInvoker {
         FunctionInvokeInstruction(fun.value._1, fun.value._2), funName).lastOption
       fun.realValue = last
       return
-    }
-
-    def findVariable(k: JsonCollection.Var): Option[JsonCollection.Val] = {
-      val ipt = getInvokePath(variables)
-
-      if (ipt.isEmpty) {
-        return variables.get(k.value)
-      }
-
-      val ipts = ipt.get.split("\\$")
-      val option = (0 to ipts.length).flatMap(i => {
-        val pts = ipts.slice(0, ipts.length - i)
-        variables.get(pts.mkString("$") + "$" + k.value)
-      }).headOption
-
-      if (option.isEmpty) {
-        val scopeVal = variables.get(funName.map(i => i + "$").getOrElse("") + k.value)
-        if (scopeVal.isDefined) {
-          return scopeVal
-        }
-        return variables.get(k.value)
-      }
-      return option
     }
 
     if (v.vars.nonEmpty) {
@@ -616,6 +597,30 @@ trait InstructionInvoker {
           k.realValue = vl
         }
       })
+    }
+
+
+    def findVariable(k: JsonCollection.Var): Option[JsonCollection.Val] = {
+      val ipt = getInvokePath(variables)
+
+      if (ipt.isEmpty) {
+        return variables.get(k.value)
+      }
+
+      val ipts = ipt.get.split("\\$")
+      val option = (0 to ipts.length).flatMap(i => {
+        val pts = ipts.slice(0, ipts.length - i)
+        variables.get(pts.mkString("$") + "$" + k.value)
+      }).headOption
+
+      if (option.isEmpty) {
+        val scopeVal = variables.get(funName.map(i => i + "$").getOrElse("") + k.value)
+        if (scopeVal.isDefined) {
+          return scopeVal
+        }
+        return variables.get(k.value)
+      }
+      return option
     }
   }
 
