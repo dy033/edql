@@ -73,8 +73,8 @@ class EDQLScriptRunner(ls: Seq[URL], psiFileFactoryImpl: PsiFileFactoryImpl) ext
 
   def getScriptFilePathFromEnv: Option[String] = {
     val config: Config = ConfigFactory.load()
-    config.hasPath("eql.file") match {
-      case true => Some(config.getString("eql.file"))
+    config.hasPath("edql.file") match {
+      case true => Some(config.getString("edql.file"))
       case false => None
     }
   }

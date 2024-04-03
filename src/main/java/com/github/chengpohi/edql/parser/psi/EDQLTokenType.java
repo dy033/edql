@@ -12,6 +12,6 @@ public class EDQLTokenType extends IElementType {
 
     @Override
     public String toString() {
-        return "EQLTokenType." + super.toString();
+        return "EDQLTokenType." + super.toString();
     }
 }
