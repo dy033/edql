@@ -66,7 +66,7 @@ case class HostInfo(host: String,
                     kibanaProxy: Boolean = false,
                     authInfo: Option[AuthInfo] = None,
                     proxyInfo: Option[ProxyInfo] = None,
-                    version: Option[String] = None)
+                    version: Option[String] = None, name: Option[String] = None)
 
 trait EDQLConfig {
   lazy val config: Config =
