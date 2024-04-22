@@ -64,6 +64,7 @@ case class HostInfo(host: String,
                     uri: URI,
                     timeout: Int = 5000,
                     kibanaProxy: Boolean = false,
+                    readOnly: Boolean = false,
                     authInfo: Option[AuthInfo] = None,
                     proxyInfo: Option[ProxyInfo] = None,
                     version: Option[String] = None, name: Option[String] = None)
@@ -99,7 +100,7 @@ trait EDQLConfig {
 
     this.initKibanaProxy(hostInfo, sslContext, restClientBuilder, credentialsProvider)
     val client = restClientBuilder.build()
-    EDQLClient(client, hostInfo.kibanaProxy, hostInfo.uri.getPath)
+    EDQLClient(client, hostInfo.kibanaProxy, hostInfo.readOnly, hostInfo.uri.getPath)
   }
 
   private def initSSLContext(hostInfo: HostInfo, restClientBuilder: RestClientBuilder) = {

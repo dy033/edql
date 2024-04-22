@@ -11,6 +11,7 @@ import scala.concurrent.duration.Duration
 sealed case class ScriptContext(hostInfo: HostInfo) extends EDQLConfig with Context {
   override implicit val resultTimeout: Duration = Duration.apply(hostInfo.timeout, duration.MILLISECONDS)
   override implicit val kibanaProxy: Boolean = hostInfo.kibanaProxy
+  override implicit val readOnly: Boolean = hostInfo.readOnly
   override implicit lazy val eqlClient: EDQLClient = buildRestClient(hostInfo)
 
   def clear(): Unit = variables.clear()
@@ -21,7 +22,7 @@ object ScriptContext {
 
   def apply(hostInfo: HostInfo,
             vars: Map[String, JsonCollection.Val]): ScriptContext = {
-    val cacheKey = s"$hostInfo.endpoint-" + hostInfo.authInfo.map(i => i.cacheKey).getOrElse("") + s"-${hostInfo.timeout}" + s"-${hostInfo.kibanaProxy}" + s"-${hostInfo.proxyInfo.map(i => i.cacheKey).getOrElse("")}"
+    val cacheKey = s"$hostInfo.endpoint-" + hostInfo.authInfo.map(i => i.cacheKey).getOrElse("") + s"-${hostInfo.timeout}" + s"-${hostInfo.kibanaProxy}" + s"-${hostInfo.readOnly}" + s"-${hostInfo.proxyInfo.map(i => i.cacheKey).getOrElse("")}"
 
     val cacheContext = cache.get(cacheKey)
     if (isCacheValid(cacheContext)) {

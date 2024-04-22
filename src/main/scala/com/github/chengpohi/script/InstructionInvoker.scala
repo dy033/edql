@@ -133,7 +133,7 @@ trait InstructionInvoker {
         .map(i => i.asInstanceOf[TimeoutInstruction])
         .map(i => i.timeout).getOrElse(5000)
     val authInfo = AuthInfo(authorization, username, password, apikeyId, apikeySecret, apiSessionToken, awsRegion, null)
-    HostInfo(endPoint.get.endpoint, URI.create(endPoint.get.endpoint), timeout, endPoint.get.kibanaProxy, Some(authInfo))
+    HostInfo(endPoint.get.endpoint, URI.create(endPoint.get.endpoint), timeout, endPoint.get.kibanaProxy, readOnly = false, Some(authInfo))
   }
 
   private def parseImports(cIns: Seq[Instruction2], runDir: String): Seq[Instruction2] = {

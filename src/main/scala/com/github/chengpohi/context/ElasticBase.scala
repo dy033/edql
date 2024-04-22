@@ -12,6 +12,7 @@ trait ElasticBase {
   implicit val eqlClient: EDQLClient
   val restClient: RestClient = eqlClient.restClient
   val kibanaProxy: Boolean = eqlClient.kibanaProxy
+  val readOnly: Boolean = eqlClient.readOnly
   val pathPrefix: String = eqlClient.pathPrefix
 
   def toJavaMap[A](m: Map[A, _]): java.util.Map[A, _] = {

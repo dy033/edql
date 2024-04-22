@@ -13,6 +13,7 @@ import scala.concurrent.Future
 trait EDQLDefinition extends ElasticBase with EDQLExecutor with FutureOps {
   val KIBANA_PROXY_METHOD: String = "KIBANA_PROXY_METHOD"
   val KIBANA_PATH_PREFIX: String = "KIBANA_PATH_PREFIX"
+  val READONLY_MODE: String = "readonly mode"
 
   case class GetActionDefinition(path: String, action: Option[JsonCollection.Val])
     extends Definition[String] {
@@ -52,6 +53,10 @@ trait EDQLDefinition extends ElasticBase with EDQLExecutor with FutureOps {
   case class HeadActionDefinition(path: String, action: Option[String])
     extends Definition[String] {
     override def execute: Future[String] = {
+      if (readOnlyPath(path)) {
+        throw new RuntimeException(READONLY_MODE)
+      }
+
       val request = new Request(if (kibanaProxy) "POST" else "HEAD", path);
       request.setOptions(RequestOptions.DEFAULT.toBuilder
         .addHeader(KIBANA_PROXY_METHOD, "HEAD")
@@ -81,6 +86,11 @@ trait EDQLDefinition extends ElasticBase with EDQLExecutor with FutureOps {
   case class PostActionDefinition(path: String, action: Seq[JsonCollection.Val])
     extends Definition[String] {
     override def execute: Future[String] = {
+      if (readOnlyPath(path)) {
+        throw new RuntimeException(READONLY_MODE)
+      }
+
+
       val request = new Request("POST", path);
 
       request.setOptions(RequestOptions.DEFAULT.toBuilder
@@ -137,9 +147,19 @@ trait EDQLDefinition extends ElasticBase with EDQLExecutor with FutureOps {
     override def json: String = execute.await.json
   }
 
+  def readOnlyPath(path: String): Boolean = {
+    if (!readOnly) {
+      return false
+    }
+    return path.contains("/_update") || path.contains("/_delete") || path.contains("/_bulk")
+  }
+
   case class PutActionDefinition(path: String, action: Option[String])
     extends Definition[String] {
     override def execute: Future[String] = {
+      if (readOnly) {
+        throw new RuntimeException(READONLY_MODE)
+      }
       val request = new Request(if (kibanaProxy) "POST" else "PUT", path);
       request.setOptions(RequestOptions.DEFAULT.toBuilder
         .addHeader(KIBANA_PROXY_METHOD, "PUT")
@@ -168,6 +188,9 @@ trait EDQLDefinition extends ElasticBase with EDQLExecutor with FutureOps {
   case class DeleteActionDefinition(path: String, action: Option[String])
     extends Definition[String] {
     override def execute: Future[String] = {
+      if (readOnly) {
+        throw new RuntimeException(READONLY_MODE)
+      }
       val request = new Request(if (kibanaProxy) "POST" else "DELETE", path);
       request.setOptions(RequestOptions.DEFAULT.toBuilder
         .addHeader(KIBANA_PROXY_METHOD, "DELETE")
