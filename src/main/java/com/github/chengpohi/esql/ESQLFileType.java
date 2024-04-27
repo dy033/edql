@@ -1,6 +1,7 @@
 package com.github.chengpohi.esql;
 
 import com.github.chengpohi.esql.parser.psi.ESQLLanguage;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.util.NlsContexts;
 import com.intellij.openapi.util.NlsSafe;
@@ -34,6 +35,6 @@ public class ESQLFileType extends LanguageFileType {
 
     @Override
     public Icon getIcon() {
-        return null;
+        return AllIcons.FileTypes.Text;
     }
 }

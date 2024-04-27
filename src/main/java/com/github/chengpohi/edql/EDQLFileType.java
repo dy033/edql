@@ -1,5 +1,6 @@
 package com.github.chengpohi.edql;
 
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -36,7 +37,7 @@ public class EDQLFileType extends LanguageFileType {
     @Nullable
     @Override
     public Icon getIcon() {
-        return null;
+        return AllIcons.FileTypes.Text;
     }
 
 }
