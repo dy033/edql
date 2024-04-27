@@ -80,7 +80,7 @@ jobs:
         run: |
           cd intellij-qsharp
           qsharp/installers.cmd -Dintellij.build.use.compiled.classes=false
-          ls -lh out/qsharp-ce/artifacts/
+          ls -lh out/qsharp/artifacts/
           cd ..
 
       # Remove old release drafts by using the curl request for the available releases with a draft flag
