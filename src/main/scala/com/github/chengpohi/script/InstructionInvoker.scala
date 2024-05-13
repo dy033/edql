@@ -466,8 +466,15 @@ trait InstructionInvoker {
         val v1 = evalBasicValue(functions, context, v.a, funName)
         v.b match {
           case Some(v3) => {
-            val v2 = evalBasicValue(functions, context, v3, funName)
-            v.realValue = Some(v1.minus(v2))
+            v3 match {
+              case tree: JsonCollection.ArithTree if tree.op.isDefined && tree.order.isEmpty =>
+                val op = if (tree.op.get == "-") "+" else if (tree.op.get == "+") "-" else tree.op.get
+                val v2 = evalBasicValue(functions, context, JsonCollection.ArithTree(tree.a, Some(op), tree.b), funName)
+                v.realValue = Some(v1.minus(v2))
+              case _ =>
+                val v2 = evalBasicValue(functions, context, v3, funName)
+                v.realValue = Some(v1.minus(v2))
+            }
           }
           case None => v.realValue = Some(v1)
         }

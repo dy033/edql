@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.json.JsonReadFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.chengpohi.edql.parser.psi._
 import com.intellij.psi.PsiElement
+import com.intellij.psi.util.PsiTreeUtil
 import org.apache.commons.collections.CollectionUtils
 
 import java.util
@@ -60,6 +61,24 @@ trait JsonValParser {
 
   def toJsonVal(expr: EDQLExpr): JsonCollection.Val = {
     if (expr.getExpr != null) {
+      if (expr.getChildren != null) {
+        val binsuffixes = expr.getChildren.filter(i => i.isInstanceOf[EDQLExpr])
+          .filter(i => i.asInstanceOf[EDQLExpr].getBinsuffix != null)
+          .map(_.asInstanceOf[EDQLExpr].getBinsuffix)
+        if (binsuffixes.length > 0) {
+          val paren = if (expr.getFirstChild.getNode.getElementType == EDQLTypes.L_PAREN) true else false
+          val value = toJsonVal(util.Arrays.asList(binsuffixes: _*), toJsonVal(expr.getExpr))
+          return value match {
+            case tree: JsonCollection.ArithTree =>
+              if (paren) {
+                tree.order = Some(100)
+              }
+              tree
+            case _ => value
+          }
+        }
+      }
+
       return toJsonVal(expr.getExpr)
     }
 
