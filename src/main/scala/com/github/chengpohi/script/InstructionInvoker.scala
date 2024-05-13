@@ -217,6 +217,7 @@ trait InstructionInvoker {
           mapRealValue(globalFunctions, context, i, funName)
           context.variables.put(it._1, i.realValue.get)
         case i: JsonCollection.ArithTree =>
+          context.variables.put(it._1, i)
         case _ =>
           context.variables.put(it._1, it._2)
       }
