@@ -82,11 +82,11 @@ trait InstructionInvoker {
 
     val vars = invokeIns.filter(_.isInstanceOf[VariableInstruction])
       .map(i => i.asInstanceOf[VariableInstruction])
-      .map(i => i.variableName -> i.value).toMap
+      .map(i => i.variableName -> i.value).toList
 
-    val globalVars = vars.map(i => i._1 -> i._2) + ("CONTEXT_PATH" -> JsonCollection.Str(runContext.runDir))
+    val globalVars = vars.map(i => i._1 -> i._2) :+ ("CONTEXT_PATH" -> JsonCollection.Str(runContext.runDir))
     val hostInfo = buildHostInfo(runContext, endpoint, invokeIns)
-    val context = ScriptContext(hostInfo, globalVars)
+    val context = ScriptContext(hostInfo, globalVars.toMap)
 
     evalFunParams(globalFunctions, context, vars)
     (globalFunctions, context)
@@ -201,7 +201,7 @@ trait InstructionInvoker {
 
   private def evalFunParams(globalFunctions: Map[String, FunctionInstruction],
                             context: ScriptContext,
-                            parms: Map[String, JsonCollection.Val],
+                            parms: Seq[(String, JsonCollection.Val)],
                             funName: Option[String] = None
                            ) = {
     parms.foreach(it => {
@@ -288,7 +288,7 @@ trait InstructionInvoker {
     setInvokePath(context, Some(funName))
 
     try {
-      val funParams = fun.variableNames.map(i => context.variables.get("INVOKE_PATH").map(_.value).getOrElse(funName) + "$" + i).zip(values).toMap
+      val funParams = fun.variableNames.map(i => context.variables.get("INVOKE_PATH").map(_.value).getOrElse(funName) + "$" + i).zip(values)
       clearContextBeforeInvoke(context, fun.instructions, funParams)
 
       funParams.filter(_._2.isInstanceOf[JsonCollection.Var]).foreach(i => {
@@ -302,13 +302,13 @@ trait InstructionInvoker {
       val nestFunctions = instructions.filter(_.isInstanceOf[FunctionInstruction]).map(i => {
         val f = i.asInstanceOf[FunctionInstruction]
         f.funcName + f.variableNames.size -> f
-      }).toMap
+      }).toList
 
       val funcBodyVars = instructions.filter(_.isInstanceOf[VariableInstruction])
         .map(i => i.asInstanceOf[VariableInstruction])
         .map(i => {
           context.variables.get("INVOKE_PATH").map(_.value).getOrElse(funName) + "$" + i.variableName -> i.value
-        }).toMap
+        }).toList
 
       val nestVars = (funcBodyVars ++ funParams).flatMap(fv => {
         nestFunctions.map(n => {
@@ -343,7 +343,7 @@ trait InstructionInvoker {
     }
   }
 
-  private def clearContextBeforeInvoke(context: ScriptContext, instructions: Seq[Instruction2], funParams: Map[String, JsonCollection.Val]) = {
+  private def clearContextBeforeInvoke(context: ScriptContext, instructions: Seq[Instruction2], funParams: Seq[(String, JsonCollection.Val)]) = {
     instructions.foreach(fi => {
       fi.ds.filter(_.isInstanceOf[JsonCollection.Dynamic]).foreach(di => {
         di.clean()
@@ -365,7 +365,7 @@ trait InstructionInvoker {
         val fs: mutable.Map[String, FunctionInstruction] = mutable.Map[String, FunctionInstruction]()
         fs.addAll(functions)
         fs.put(fun.funcName + fun.variableNames.size, fun)
-        clearContextBeforeInvoke(context, fun.instructions, Map())
+        clearContextBeforeInvoke(context, fun.instructions, List())
         val invoke = FunctionInvokeInstruction(fun.funcName, Seq(i))
         runInstructions(fs.toMap, context, Seq(invoke), funName).lastOption
       }).filter(_.isDefined).map(_.get)
