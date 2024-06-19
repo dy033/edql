@@ -6,6 +6,28 @@ It is full compatible with official Query DSL, can just copy query DSL and run o
 
 It has powerful script engine: support function, variable and iteration etc. with smart Intellij you can easily write query DSL(refactor, extract etc).
 
+```
+# f1 = k1
+# f2 in ["k1", "k2", "k3"]
+# f3 date field gt now-3d
+# f4 number lt 20
+POST my-index/_search
+{
+  "query": {
+    "bool": {
+      "filter": [
+        term("f1", "k1"),
+        terms("f2", ["k1", "k2", "k3"]),
+        gt("f3", "now-3d"),
+        lt("f4", 20)
+      ]
+    }
+  }
+}
+```
+
+
+
 
 ## Use with EDQL Intellij GUI Client
 Please view more on:  [EDQL Wiki](https://chengpohi.github.io/) or [Install EDQL](https://plugins.jetbrains.com/plugin/16364-elasticsearch-query--edql/)
