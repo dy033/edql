@@ -5,9 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface EDQLMapIter extends PsiElement {
+public interface EDQLMapExpr extends PsiElement {
 
   @NotNull
-  EDQLMapExpr getMapExpr();
+  List<EDQLExpr> getExprList();
+
+  @Nullable
+  EDQLReturnExpr getReturnExpr();
 
 }

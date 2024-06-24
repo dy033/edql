@@ -1186,7 +1186,40 @@ public class EDQLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '.map' L_CURLY 'it' MAPPING L_CURLY expr* returnExpr? R_CURLY R_CURLY
+  // L_CURLY  expr* returnExpr? R_CURLY
+  public static boolean mapExpr(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapExpr")) return false;
+    if (!nextTokenIs(b, L_CURLY)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, L_CURLY);
+    r = r && mapExpr_1(b, l + 1);
+    r = r && mapExpr_2(b, l + 1);
+    r = r && consumeToken(b, R_CURLY);
+    exit_section_(b, m, MAP_EXPR, r);
+    return r;
+  }
+
+  // expr*
+  private static boolean mapExpr_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapExpr_1")) return false;
+    while (true) {
+      int c = current_position_(b);
+      if (!expr(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "mapExpr_1", c)) break;
+    }
+    return true;
+  }
+
+  // returnExpr?
+  private static boolean mapExpr_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "mapExpr_2")) return false;
+    returnExpr(b, l + 1);
+    return true;
+  }
+
+  /* ********************************************************** */
+  // '.map' L_CURLY 'it' MAPPING mapExpr R_CURLY
   public static boolean mapIter(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "mapIter")) return false;
     boolean r;
@@ -1194,30 +1227,11 @@ public class EDQLParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, ".map");
     r = r && consumeToken(b, L_CURLY);
     r = r && consumeToken(b, "it");
-    r = r && consumeTokens(b, 0, MAPPING, L_CURLY);
-    r = r && mapIter_5(b, l + 1);
-    r = r && mapIter_6(b, l + 1);
-    r = r && consumeTokens(b, 0, R_CURLY, R_CURLY);
+    r = r && consumeToken(b, MAPPING);
+    r = r && mapExpr(b, l + 1);
+    r = r && consumeToken(b, R_CURLY);
     exit_section_(b, l, m, r, false, null);
     return r;
-  }
-
-  // expr*
-  private static boolean mapIter_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "mapIter_5")) return false;
-    while (true) {
-      int c = current_position_(b);
-      if (!expr(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "mapIter_5", c)) break;
-    }
-    return true;
-  }
-
-  // returnExpr?
-  private static boolean mapIter_6(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "mapIter_6")) return false;
-    returnExpr(b, l + 1);
-    return true;
   }
 
   /* ********************************************************** */

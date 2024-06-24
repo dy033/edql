@@ -29,6 +29,7 @@ public class EDQLParserDefinition implements ParserDefinition {
     public static final TokenSet JSON_CONTAINERS = TokenSet.create(EDQLTypes.OBJ);
     public static final TokenSet FUNCTION = TokenSet.create(EDQLTypes.FUNCTION_BODY);
     public static final TokenSet FUNCTION_IDENT = TokenSet.create(EDQLTypes.FUNCTION_BODY, EDQLTypes.FUNCTION_EXPR);
+    public static final TokenSet MAP_EXPR = TokenSet.create(EDQLTypes.MAP_EXPR);
 
 
     @NotNull

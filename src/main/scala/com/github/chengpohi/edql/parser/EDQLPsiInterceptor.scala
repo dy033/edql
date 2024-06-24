@@ -206,9 +206,9 @@ class EDQLPsiInterceptor(val parserFactory: EDQLParserFactory) extends Intercept
 
   private def buildMapIterInstruction(arr: JsonCollection.Arr, mapIter: EDQLMapIter): MapIterInstruction = {
     val anonymousFun = "anonymousFun_" + RandomStringUtils.randomAlphabetic(10)
-    val bs: Seq[Instruction2] = mapIter.getExprList.asScala.flatMap(i => parseExpr(i)).toSeq
+    val bs: Seq[Instruction2] = mapIter.getMapExpr.getExprList.asScala.flatMap(i => parseExpr(i)).toSeq
 
-    mapIter.getReturnExpr match {
+    mapIter.getMapExpr.getReturnExpr match {
       case null =>
         MapIterInstruction(arr, FunctionInstruction(anonymousFun, Seq("it"), bs))
       case r =>

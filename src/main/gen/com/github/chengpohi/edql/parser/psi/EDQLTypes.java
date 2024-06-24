@@ -36,6 +36,7 @@ public interface EDQLTypes {
   IElementType IFSPEC = new EDQLElementType("IFSPEC");
   IElementType IMPORTOP = new EDQLElementType("IMPORTOP");
   IElementType LOADOP = new EDQLElementType("LOADOP");
+  IElementType MAP_EXPR = new EDQLElementType("MAP_EXPR");
   IElementType MAP_ITER = new EDQLElementType("MAP_ITER");
   IElementType MEMBER = new EDQLElementType("MEMBER");
   IElementType MEMBERS = new EDQLElementType("MEMBERS");
@@ -220,6 +221,9 @@ public interface EDQLTypes {
       }
       else if (type == LOADOP) {
         return new EDQLLoadopImpl(node);
+      }
+      else if (type == MAP_EXPR) {
+        return new EDQLMapExprImpl(node);
       }
       else if (type == MAP_ITER) {
         return new EDQLMapIterImpl(node);

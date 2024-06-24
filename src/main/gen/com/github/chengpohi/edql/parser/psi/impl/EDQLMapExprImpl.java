@@ -11,14 +11,14 @@ import static com.github.chengpohi.edql.parser.psi.EDQLTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.github.chengpohi.edql.parser.psi.*;
 
-public class EDQLMapIterImpl extends ASTWrapperPsiElement implements EDQLMapIter {
+public class EDQLMapExprImpl extends ASTWrapperPsiElement implements EDQLMapExpr {
 
-  public EDQLMapIterImpl(@NotNull ASTNode node) {
+  public EDQLMapExprImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull EDQLVisitor visitor) {
-    visitor.visitMapIter(this);
+    visitor.visitMapExpr(this);
   }
 
   @Override
@@ -29,8 +29,14 @@ public class EDQLMapIterImpl extends ASTWrapperPsiElement implements EDQLMapIter
 
   @Override
   @NotNull
-  public EDQLMapExpr getMapExpr() {
-    return findNotNullChildByClass(EDQLMapExpr.class);
+  public List<EDQLExpr> getExprList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, EDQLExpr.class);
+  }
+
+  @Override
+  @Nullable
+  public EDQLReturnExpr getReturnExpr() {
+    return findChildByClass(EDQLReturnExpr.class);
   }
 
 }
