@@ -376,11 +376,11 @@ trait InstructionInvoker {
       case a: JsonCollection.Arr => mapArr(a)
       case v: JsonCollection.Var if v.realValue.isDefined && v.realValue.get.isInstanceOf[JsonCollection.Arr] =>
         mapArr(v.realValue.get.asInstanceOf[JsonCollection.Arr])
-      case v: JsonCollection.Var if v.realValue.isEmpty && context.variables.contains(v.value) =>
-        val reaVal = context.variables(v.value)
-        reaVal match {
-          case arr: JsonCollection.Arr =>
-            mapArr(arr)
+      case v: JsonCollection.Var if v.realValue.isEmpty =>
+        mapRealValue(functions, context, m.a, funName)
+        m.a.asInstanceOf[JsonCollection.Var].realValue match {
+          case arr: Option[JsonCollection.Arr] if arr.isDefined =>
+            mapArr(arr.get)
           case _ =>
             throw new RuntimeException("unsupported map")
         }
