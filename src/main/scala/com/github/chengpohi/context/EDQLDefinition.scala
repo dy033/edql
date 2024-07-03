@@ -129,21 +129,6 @@ trait EDQLDefinition extends ElasticBase with EDQLExecutor with FutureOps {
       }
     }
 
-    private def trimQueryClause(i: JsonCollection.Obj): JsonCollection.Obj = {
-      val emptyQueryClause = i.get("query").flatMap(_ match {
-        case value: JsonCollection.Var =>
-          value.realValue
-        case a => Some(a)
-      }).filter(i => i.isInstanceOf[JsonCollection.Obj]).exists(i => {
-        i.asInstanceOf[JsonCollection.Obj].value.isEmpty
-      })
-
-      emptyQueryClause match {
-        case true => i.remove("query")
-        case false => i
-      }
-    }
-
     override def json: String = execute.await.json
   }
 
@@ -154,7 +139,7 @@ trait EDQLDefinition extends ElasticBase with EDQLExecutor with FutureOps {
     return path.contains("/_update") || path.contains("/_delete") || path.contains("/_bulk")
   }
 
-  case class PutActionDefinition(path: String, action: Option[String])
+  case class PutActionDefinition(path: String, action: Seq[JsonCollection.Val])
     extends Definition[String] {
     override def execute: Future[String] = {
       if (readOnly) {
@@ -165,7 +150,20 @@ trait EDQLDefinition extends ElasticBase with EDQLExecutor with FutureOps {
         .addHeader(KIBANA_PROXY_METHOD, "PUT")
         .addHeader(KIBANA_PATH_PREFIX, pathPrefix)
       );
-      request.setJsonEntity(action.orNull)
+      val as = action.filter(_.isInstanceOf[JsonCollection.Obj]).map(_.asInstanceOf[JsonCollection.Obj])
+      as match {
+        case Seq() =>
+        case a =>
+          if (a.size > 1) {
+            request.setJsonEntity(
+              a.map(i => {
+                trimQueryClause(i).toJson
+              }).mkString(System.lineSeparator()) + System.lineSeparator())
+          } else if (a.size == 1) {
+            val h = trimQueryClause(a.head)
+            request.setJsonEntity(h.toJson + System.lineSeparator())
+          }
+      }
       Future {
         try {
           val entity = restClient.performRequest(request).getEntity
@@ -228,6 +226,22 @@ trait EDQLDefinition extends ElasticBase with EDQLExecutor with FutureOps {
     }
 
     override def json: String = execute.await.json
+  }
+
+
+  private def trimQueryClause(i: JsonCollection.Obj): JsonCollection.Obj = {
+    val emptyQueryClause = i.get("query").flatMap(_ match {
+      case value: JsonCollection.Var =>
+        value.realValue
+      case a => Some(a)
+    }).filter(i => i.isInstanceOf[JsonCollection.Obj]).exists(i => {
+      i.asInstanceOf[JsonCollection.Obj].value.isEmpty
+    })
+
+    emptyQueryClause match {
+      case true => i.remove("query")
+      case false => i
+    }
   }
 
 }

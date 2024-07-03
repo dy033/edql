@@ -148,7 +148,7 @@ trait InterceptFunction {
       action.map(i => extractDynamics(i)).getOrElse(Seq())
   }
 
-  case class PutActionInstruction(path: String, action: Option[JsonCollection.Val]) extends Instruction2 {
+  case class PutActionInstruction(path: String, action: Seq[JsonCollection.Val]) extends Instruction2 {
     override def name = "put"
 
     def execute(implicit eql: Context): Definition[_] = {
@@ -156,14 +156,14 @@ trait InterceptFunction {
       val newPath = mapNewPath(eql.variables, path)
 
       if (newPath.startsWith("/")) {
-        PutActionDefinition(newPath, action.map(_.toJson))
+        PutActionDefinition(newPath, action)
       } else {
-        PutActionDefinition("/" + newPath, action.map(_.toJson))
+        PutActionDefinition("/" + newPath, action)
       }
     }
 
     override def ds: Seq[JsonCollection.Dynamic] =
-      action.map(i => extractDynamics(i)).getOrElse(Seq())
+      action.flatMap(i => extractDynamics(i))
   }
 
   case class GetActionInstruction(path: String, action: Option[JsonCollection.Val]) extends Instruction2 {

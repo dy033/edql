@@ -228,7 +228,7 @@ class EDQLPsiInterceptor(val parserFactory: EDQLParserFactory) extends Intercept
         GetActionInstruction(expr.getPath.getText + Option.apply(expr.getQuery).map(i => i.getText).getOrElse(""), v.headOption)
       }
       case EDQLTypes.PUT => {
-        PutActionInstruction(expr.getPath.getText + Option.apply(expr.getQuery).map(i => i.getText).getOrElse(""), v.headOption)
+        PutActionInstruction(expr.getPath.getText + Option.apply(expr.getQuery).map(i => i.getText).getOrElse(""), v)
       }
       case EDQLTypes.DELETE => {
         DeleteActionInstruction(expr.getPath.getText + Option.apply(expr.getQuery).map(i => i.getText).getOrElse(""), v.headOption)
