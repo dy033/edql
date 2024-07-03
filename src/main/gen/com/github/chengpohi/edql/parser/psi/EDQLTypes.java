@@ -63,12 +63,10 @@ public interface EDQLTypes {
   IElementType AWSREGION = new EDQLTokenType("AWSRegion");
   IElementType BAR = new EDQLTokenType("BAR");
   IElementType CARAT = new EDQLTokenType("CARAT");
-  IElementType CLUSTER = new EDQLTokenType("cluster");
   IElementType COLON = new EDQLTokenType(":");
   IElementType COLON2 = new EDQLTokenType("COLON2");
   IElementType COLON3 = new EDQLTokenType("COLON3");
   IElementType COMMA = new EDQLTokenType(",");
-  IElementType COUNT = new EDQLTokenType("count");
   IElementType DELETE = new EDQLTokenType("DELETE");
   IElementType DOLLAR = new EDQLTokenType("$");
   IElementType DOT = new EDQLTokenType(".");
@@ -105,7 +103,6 @@ public interface EDQLTypes {
   IElementType L_PAREN = new EDQLTokenType("(");
   IElementType MAPPING = new EDQLTokenType("->");
   IElementType MINUS = new EDQLTokenType("-");
-  IElementType NODE = new EDQLTokenType("node");
   IElementType NOT_EQUAL = new EDQLTokenType("NOT_EQUAL");
   IElementType NULL = new EDQLTokenType("null");
   IElementType NUMBER = new EDQLTokenType("NUMBER");

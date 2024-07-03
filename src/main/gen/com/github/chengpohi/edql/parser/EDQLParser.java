@@ -1321,7 +1321,7 @@ public class EDQLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // POST | DELETE | PUT | GET | HEAD | CLUSTER | NODE | COUNT
+  // POST | DELETE | PUT | GET | HEAD
   public static boolean method(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "method")) return false;
     boolean r;
@@ -1331,9 +1331,6 @@ public class EDQLParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, PUT);
     if (!r) r = consumeToken(b, GET);
     if (!r) r = consumeToken(b, HEAD);
-    if (!r) r = consumeToken(b, CLUSTER);
-    if (!r) r = consumeToken(b, NODE);
-    if (!r) r = consumeToken(b, COUNT);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
