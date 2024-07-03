@@ -6,10 +6,6 @@ import org.elasticsearch.client.{Request, RequestOptions, ResponseException}
 
 import scala.concurrent.Future
 
-/**
- * eql
- * Created by chengpohi on 6/28/16.
- */
 trait EDQLDefinition extends ElasticBase with EDQLExecutor with FutureOps {
   val KIBANA_PROXY_METHOD: String = "KIBANA_PROXY_METHOD"
   val KIBANA_PATH_PREFIX: String = "KIBANA_PATH_PREFIX"
@@ -132,13 +128,6 @@ trait EDQLDefinition extends ElasticBase with EDQLExecutor with FutureOps {
     override def json: String = execute.await.json
   }
 
-  def readOnlyPath(path: String): Boolean = {
-    if (!readOnly) {
-      return false
-    }
-    return path.contains("/_update") || path.contains("/_delete") || path.contains("/_bulk")
-  }
-
   case class PutActionDefinition(path: String, action: Seq[JsonCollection.Val])
     extends Definition[String] {
     override def execute: Future[String] = {
@@ -228,6 +217,12 @@ trait EDQLDefinition extends ElasticBase with EDQLExecutor with FutureOps {
     override def json: String = execute.await.json
   }
 
+  private def readOnlyPath(path: String): Boolean = {
+    if (!readOnly) {
+      return false
+    }
+    return path.contains("/_update") || path.contains("/_delete") || path.contains("/_bulk")
+  }
 
   private def trimQueryClause(i: JsonCollection.Obj): JsonCollection.Obj = {
     val emptyQueryClause = i.get("query").flatMap(_ match {
