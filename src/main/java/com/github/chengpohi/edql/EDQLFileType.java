@@ -25,7 +25,7 @@ public class EDQLFileType extends LanguageFileType {
     @NotNull
     @Override
     public String getDescription() {
-        return "EDQL script language";
+        return "EDQL";
     }
 
     @NotNull
@@ -39,5 +39,4 @@ public class EDQLFileType extends LanguageFileType {
     public Icon getIcon() {
         return AllIcons.FileTypes.Text;
     }
-
 }
